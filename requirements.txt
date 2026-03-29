@@ -1,0 +1,9 @@
+Django==6.0.2
+asgiref==3.11.1
+sqlparse==0.5.5
+tzdata==2025.3
+djangorestframework==3.16.1
+djoser==2.3.3
+pillow==12.1.1
+django-phonenumber-field==8.4.0
+phonenumberslite==9.0.26  
