@@ -25,7 +25,7 @@ class PortfolioMethodsSerialzier(serializers.ModelSerializer):
         if request:
             return request.build_absolute_uri(obj.image.url)
 
-        return f"{settings.URL}{obj.image.url}"
+        return obj.image.url
 
 
 class UserSerializer(serializers.ModelSerializer):
