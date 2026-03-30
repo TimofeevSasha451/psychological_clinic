@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth import get_user_model
+from django.contrib.auth.admin import UserAdmin
 
 from .models import Application, Specialist, Portfolio, WorkMethods, PortfolioMethods
 
@@ -7,7 +8,7 @@ User = get_user_model()
 
 
 @admin.register(User)
-class UserAdmin(admin.ModelAdmin):
+class UserAdmin(UserAdmin):
     list_display = ('first_name', 'middle_name', 'last_name', 'email',
                     'phone_number', 'is_active', 'role', 'password')
     search_fields = ('email', 'phone_number')
