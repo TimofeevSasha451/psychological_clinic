@@ -15,7 +15,7 @@ class User(AbstractUser):
                                   null=False)
     last_name = models.CharField('Фамилия', max_length=150, blank=False,
                                  null=False)
-    email = models.EmailField('Почта', blank=False, null=False, unique=True)
+    email = models.EmailField('Почта', blank=True, null=True, unique=True)
     phone_number = PhoneNumberField(unique=True)
     username = models.CharField(unique=True, blank=True, null=True)
     role = models.CharField(
