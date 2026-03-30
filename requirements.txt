@@ -8,3 +8,4 @@ pillow==12.1.1
 django-phonenumber-field==8.4.0
 phonenumberslite==9.0.26
 django-cors-headers==4.9.0
+gunicorn~=25.3.0
