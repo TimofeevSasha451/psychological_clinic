@@ -64,6 +64,10 @@ CORS_ALLOWED_ORIGINS = [
     "https://rh19-eoxp-nce3.gw-1a.dockhost.net",
 ]
 
+CSRF_TRUSTED_ORIGINS = [
+    "https://nv89-5kzc-7g7w.gw-1a.dockhost.net"
+]
+
 CORS_ALLOW_CREDENTIALS = True
 
 CORS_ALLOW_HEADERS = [
