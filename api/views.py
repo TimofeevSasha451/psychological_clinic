@@ -3,6 +3,7 @@ from django.shortcuts import get_object_or_404, redirect
 from django.views import View
 from rest_framework import mixins, permissions, status, viewsets, views
 from rest_framework.decorators import action
+from rest_framework.parsers import JSONParser, MultiPartParser, FormParser
 from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
 from django.contrib.auth import authenticate
@@ -59,3 +60,5 @@ class ApplicationViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
     queryset = Application.objects.all()
     serializer_class = ApplicationSerializer
     permission_classes = (permissions.IsAuthenticated,)
+
+    parser_classes = [MultiPartParser, FormParser]

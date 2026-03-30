@@ -1,10 +1,8 @@
-import base64
-
-from django.core.files.base import ContentFile
 from django.contrib.auth import get_user_model
 from django.contrib.auth.password_validation import validate_password
 from rest_framework import serializers
 
+from psyschologic_backend import settings
 from structure.models import (Specialist, Portfolio, Application,
                               WorkMethods, PortfolioMethods)
 
@@ -13,36 +11,48 @@ User = get_user_model()
 
 class PortfolioMethodsSerialzier(serializers.ModelSerializer):
     methods = serializers.StringRelatedField(many=True, read_only=True)
+    image_url = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Portfolio
-        fields = ('methods',)
+        fields = ('methods', 'image', 'image_url')
+
+    def get_image_url(self, obj):
+        if not obj.image:
+            return None
+
+        request = self.context.get('request')  # Берем запрос из контекста
+        if request:
+            return request.build_absolute_uri(obj.image.url)
+
+        return f"{settings.URL}{obj.image.url}"
 
 
 class UserSerializer(serializers.ModelSerializer):
     initials = serializers.SerializerMethodField()
-    is_specialist = serializers.SerializerMethodField()
-    education = serializers.SerializerMethodField()
-    practice = serializers.SerializerMethodField()
-    link = serializers.SerializerMethodField()
-    work_email = serializers.SerializerMethodField()
-    work_methods = serializers.SerializerMethodField()
-    description = serializers.SerializerMethodField()
+    is_specialist = serializers.SerializerMethodField(required=False)
+    education = serializers.SerializerMethodField(required=False)
+    practice = serializers.SerializerMethodField(required=False)
+    link = serializers.SerializerMethodField(required=False)
+    work_email = serializers.SerializerMethodField(required=False)
+    work_methods = serializers.SerializerMethodField(required=False)
+    description = serializers.SerializerMethodField(required=False)
 
     class Meta:
         model = User
         fields = ('initials', 'phone_number', 'email', 'password',
                   'education', 'practice', 'link', 'work_email',
                   'work_methods', 'description', 'is_specialist')
-        read_only_fields = ('is_specialist', )
+        read_only_fields = ('is_specialist',)
         extra_kwargs = {
-            'password': {'write_only': True}
+            'password': {'write_only': True},
+            'phone_number': {'read_only': True}
         }
 
-    def get_description(self, obj): 
+    def get_description(self, obj):
         if Specialist.objects.filter(user=obj).exists():
             return Specialist.objects.get(user=obj).portfolio.description
-    
+
     def get_is_specialist(self, object):
         return Specialist.objects.filter(user=object).exists()
 
@@ -53,24 +63,24 @@ class UserSerializer(serializers.ModelSerializer):
             if len(obj.middle_name) != 0:
                 return f'{initials} {obj.middle_name}'
         return initials
-    
-    def get_education(self, obj): 
+
+    def get_education(self, obj):
         if Specialist.objects.filter(user=obj).exists():
             return Specialist.objects.get(user=obj).portfolio.education
-        
-    def get_practice(self, obj): 
+
+    def get_practice(self, obj):
         if Specialist.objects.filter(user=obj).exists():
             return Specialist.objects.get(user=obj).portfolio.practice
-    
-    def get_link(self, obj): 
+
+    def get_link(self, obj):
         if Specialist.objects.filter(user=obj).exists():
             return Specialist.objects.get(user=obj).link
 
-    def get_work_email(self, obj): 
+    def get_work_email(self, obj):
         if Specialist.objects.filter(user=obj).exists():
             return Specialist.objects.get(user=obj).work_email
-        
-    def get_work_methods(self, obj): 
+
+    def get_work_methods(self, obj):
         if Specialist.objects.filter(user=obj).exists():
             return PortfolioMethodsSerialzier(
                 Specialist.objects.get(user=obj).portfolio
@@ -128,9 +138,9 @@ class UserSerializer(serializers.ModelSerializer):
             if 'first_name' in validated_data:
                 spec.user.first_name = validated_data['first_name']
             if 'last_name' in validated_data:
-                spec.user.first_name = validated_data['last_name']
+                spec.user.last_name = validated_data['last_name']
             if 'middle_name' in validated_data:
-                spec.user.first_name = validated_data['middle_name']
+                spec.user.middle_name = validated_data['middle_name']
             spec.save()
         for key in self.collection:
             if key in validated_data:
@@ -140,7 +150,6 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class ApplicationSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = Application
         fields = ('email', 'resume_file')
@@ -152,52 +161,30 @@ class SpecialistSerializer(serializers.ModelSerializer):
     practice = serializers.SerializerMethodField()
     description = serializers.SerializerMethodField()
     work_methods = serializers.SerializerMethodField()
+    image = serializers.SerializerMethodField()
 
     class Meta:
         fields = ('initials', 'education', 'practice', 'description',
-                  'work_methods')
+                  'work_methods', 'image', 'link')
         model = Specialist
 
-        def get_initials(self, obj):
-            return f'{obj.user.first_name} {obj.user.last_name}'
+    def get_initials(self, obj):
+        return f'{obj.user.first_name} {obj.user.last_name}'
 
-        def get_education(self, obj):
-            return f'{obj.portfolio.education}'
+    def get_education(self, obj):
+        return f'{obj.portfolio.education}'
 
-        def get_practice(self, obj):
-            return f'{obj.portfolio.practice}'
+    def get_practice(self, obj):
+        return f'{obj.portfolio.practice}'
 
-        def get_description(self, obj):
-            return f'{obj.portfolio.description}'
+    def get_description(self, obj):
+        return f'{obj.portfolio.description}'
 
-        def get_work_methods(self, obj):
-            return PortfolioMethodsSerialzier(obj.portfolio).data['methods']
-        
+    def get_work_methods(self, obj):
+        return PortfolioMethodsSerialzier(obj.portfolio).data['methods']
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    def get_image(self, obj):
+        return PortfolioMethodsSerialzier(obj.portfolio).data['image_url']
 
 # class Base64ImageField(serializers.ImageField):
 #     def to_internal_value(self, data):
