@@ -13,6 +13,24 @@ class UserAdmin(UserAdmin):
                     'phone_number', 'is_active', 'role', 'password')
     search_fields = ('email', 'phone_number')
 
+    fieldsets = (
+        (None, {'fields': ('username', 'password')}),
+        ('cite', {
+            'fields': (
+                'first_name',
+                'middle_name',
+                'last_name',
+                'email',
+                'phone_number',
+                'role',
+            )
+        }),
+        ('Permissions', {
+            'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions'),
+        }),
+        ('Important dates', {'fields': ('last_login', 'date_joined')}),
+    )
+
 
 @admin.register(Application)
 class ApplicationAdmin(admin.ModelAdmin):
