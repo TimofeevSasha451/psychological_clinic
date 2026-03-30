@@ -61,7 +61,7 @@ CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:3000",
     "https://yourdomain.com",
     "https://nv89-5kzc-7g7w.gw-1a.dockhost.net",
-    "https://rh19-eoxp-nce3.gw-1a.dockhost.net/",
+    "https://rh19-eoxp-nce3.gw-1a.dockhost.net",
 ]
 
 CORS_ALLOW_CREDENTIALS = True
