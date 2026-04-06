@@ -115,6 +115,9 @@ class UserSerializer(serializers.ModelSerializer):
                   'phone_number', 'email', 'password']
 
     def update(self, instance, validated_data):
+        password = validated_data.pop('password', None)
+        if password:
+            instance.set_password(password)
         if Specialist.objects.filter(user=instance).exists():
             spec = Specialist.objects.get(user=instance)
             if 'education' in validated_data:
@@ -143,7 +146,7 @@ class UserSerializer(serializers.ModelSerializer):
                 spec.user.middle_name = validated_data['middle_name']
             spec.save()
         for key in self.collection:
-            if key in validated_data:
+            if key in validated_data and key != 'password':
                 setattr(instance, key, validated_data[key])
         instance.save()
         return instance
